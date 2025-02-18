@@ -10,7 +10,6 @@
 - [Running the app](#running-the-app)
 - [Test](#test)
 - [API Endpoints](#api-endpoints)
-- [License](#license)
 
 ## Installation
 
@@ -97,7 +96,3 @@ docker-compose up -d
 - **POST** `/cryptos/fetch` - Fetch and save crypto data
 - **GET** `/cryptos/:id` - Get a cryptocurrency by ID
 - **GET** `/cryptos/coingecko/:id` - Get all cryptocurrencies by CoinGecko ID
-
-## License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
