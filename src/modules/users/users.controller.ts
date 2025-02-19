@@ -17,6 +17,7 @@ export class UserController {
     @ApiResponse({ status: 200, description: 'Return all users.' })
     @Get()
     async findAll(): Promise<UserDto[]> {
+        console.log('findAll');
         return this.userService.findAll();
     }
 
@@ -24,6 +25,7 @@ export class UserController {
     @ApiResponse({ status: 200, description: 'Return a single user.' })
     @Get(':id')
     async findOne(@Param('id') id: string): Promise<UserDto | null> {
+        console.log('findOne');
         return this.userService.findOne(id);
     }
 
@@ -31,6 +33,7 @@ export class UserController {
     @ApiResponse({ status: 201, description: 'The user has been successfully created.' })
     @Post()
     async createUser(@Body() createUserRequest: UserRequest): Promise<UserDto> {
+        console.log('createUser');
         return this.userService.createUser(createUserRequest);
     }
 
@@ -38,6 +41,7 @@ export class UserController {
     @ApiResponse({ status: 200, description: 'The user has been successfully updated.' })
     @Put(':id')
     async updateUser(@Param('id') id: string, @Body() updateUserRequest: UpdateUserRequest): Promise<UserDto | null> {
+        console.log('updateUser');
         return this.userService.updateUser(id, updateUserRequest);
     }
 
@@ -45,6 +49,7 @@ export class UserController {
     @ApiResponse({ status: 200, description: 'The user has been successfully deleted.' })
     @Delete(':id')
     async deleteUser(@Param('id') id: string): Promise<void> {
+        console.log('deleteUser');
         return this.userService.deleteUser(id);
     }
 }

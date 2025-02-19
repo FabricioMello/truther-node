@@ -1,4 +1,3 @@
-import { User } from '../../core/models/User';
 import {UserDto} from "../../dtos/user.dto";
 import {UserRequest} from "./requests/UserRequest";
 import {UpdateUserRequest} from "./requests/UpdateUserRequest";

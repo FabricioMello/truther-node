@@ -1,41 +1,58 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, BadRequestException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { InjectRepository } from '@nestjs/typeorm';
+import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Crypto as CryptoEntity } from '../../core/models/Crypto';
 import { lastValueFrom } from 'rxjs';
 import { ICryptosService } from './cryptos.service.interface';
+import { CryptoPriceVariation } from '../../core/models/CryptoPriceVariation';
 
 @Injectable()
 export class CryptosService implements ICryptosService {
     constructor(
-        @InjectRepository(CryptoEntity)
+        @Inject(getRepositoryToken(CryptoEntity))
         private cryptosRepository: Repository<CryptoEntity>,
+        @Inject(getRepositoryToken(CryptoPriceVariation))
+        private priceVariationRepository: Repository<CryptoPriceVariation>,
         private httpService: HttpService,
     ) {}
 
-    async fetchAndSaveCryptoData(): Promise<void> {
+    async fetchAndSaveCryptoData(ids: string[]): Promise<void> {
         const response = await lastValueFrom(this.httpService.get('https://api.coingecko.com/api/v3/coins/markets', {
             params: {
                 vs_currency: 'usd',
-                ids: 'bitcoin,ethereum,ripple,litecoin,cardano,polkadot,binancecoin,solana,dogecoin,shiba-inu'
+                ids: ids.join(','),
+                sparkline: true
             },
         }));
 
-        const searchDate = new Date();
-        const cryptos = response.data.map((crypto: any) => ({
-            id: crypto.id,
-            marketCap: crypto.market_cap,
-            variation24h: crypto.price_change_percentage_24h,
-            variation7d: crypto.price_change_percentage_7d,
-            allTimeHigh: crypto.ath,
-            allTimeLow: crypto.atl,
-            currentValue: crypto.current_price,
-            searchDate: searchDate,
-        }));
+        if (!response.data || response.data.length === 0) {
+            throw new BadRequestException('No data returned from the API');
+        }
 
-        for (const crypto of cryptos) {
-            await this.cryptosRepository.save(crypto);
+        const searchDate = new Date();
+        if (isNaN(searchDate.getTime())) {
+            throw new BadRequestException('Invalid search date');
+        }
+
+        for (const cryptoData of response.data) {
+            const priceVariations = cryptoData.sparkline_in_7d.price.map((price: number) => {
+                return this.priceVariationRepository.create({ price });
+            });
+
+            const crypto = this.cryptosRepository.create({
+                cryptoId: cryptoData.id,
+                marketCap: cryptoData.market_cap,
+                variation24h: cryptoData.price_change_percentage_24h,
+                variation7d: cryptoData.price_change_percentage_7d,
+                allTimeHigh: cryptoData.ath,
+                allTimeLow: cryptoData.atl,
+                currentValue: cryptoData.current_price,
+                searchDate: searchDate,
+                priceVariations: priceVariations,
+            });
+
+            await this.cryptosRepository.upsert(crypto, ['cryptoId']);
         }
     }
 
@@ -58,14 +75,16 @@ export class CryptosService implements ICryptosService {
 
     findOne(id: string): Promise<CryptoEntity | null> {
         return this.cryptosRepository.findOne({
-            where: { cryptoId: id },
+            where: { id: id },
+            relations: ['priceVariations'],
             order: { searchDate: 'DESC' },
         });
     }
 
     async findAllByCoinGeckoId(id: string): Promise<CryptoEntity[]> {
         return this.cryptosRepository.find({
-            where: { id },
+            where: { cryptoId: id },
+            relations: ['priceVariations'],
             order: { searchDate: 'DESC' },
         });
     }

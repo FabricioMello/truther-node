@@ -1,13 +1,14 @@
-import { Entity, Column, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, Unique, OneToMany } from 'typeorm';
+import { CryptoPriceVariation } from './CryptoPriceVariation';
 
 @Entity()
-@Unique(['cryptoId', 'searchDate'])
+@Unique(['cryptoId'])
 export class Crypto {
     @PrimaryGeneratedColumn('uuid')
-    cryptoId!: string;
+    id!: string;
 
     @Column()
-    id!: string;
+    cryptoId!: string;
 
     @Column({ type: 'bigint', default: 0 })
     marketCap!: number;
@@ -29,4 +30,7 @@ export class Crypto {
 
     @Column()
     searchDate!: Date;
+
+    @OneToMany(() => CryptoPriceVariation, priceVariation => priceVariation.crypto, { cascade: true, onDelete: 'CASCADE' })
+    priceVariations!: CryptoPriceVariation[];
 }
