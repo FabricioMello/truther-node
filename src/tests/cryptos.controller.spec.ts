@@ -36,13 +36,6 @@ describe('CryptosController', () => {
     expect(controller).toBeDefined();
   });
 
-  it('should fetch and save crypto data', async () => {
-    const fetchAndSaveCryptoDataSpy = jest.spyOn(service, 'fetchAndSaveCryptoData').mockResolvedValue();
-    const ids = ['bitcoin', 'ethereum'];
-    await controller.fetchAndSaveCryptoData(ids);
-    expect(fetchAndSaveCryptoDataSpy).toHaveBeenCalledWith(ids);
-  });
-
   it('should return all cryptos', async () => {
     const cryptos = [{
       id: '97aa4223-ab4f-490c-9934-35a4ab63a4b6',
@@ -79,6 +72,13 @@ describe('CryptosController', () => {
     expect(result).toEqual(crypto);
   });
 
+  it('should fetch and save crypto data', async () => {
+    const fetchAndSaveCryptoDataSpy = jest.spyOn(service, 'fetchAndSaveCryptoData').mockResolvedValue();
+    const request = { ids: ['bitcoin', 'ethereum'] };
+    await controller.fetchAndSaveCryptoData(request);
+    expect(fetchAndSaveCryptoDataSpy).toHaveBeenCalledWith(request.ids);
+  });
+
   it('should save price variations correctly', async () => {
     const cryptoData = {
       id: 'bitcoin',
@@ -95,9 +95,9 @@ describe('CryptosController', () => {
 
     jest.spyOn(service, 'fetchAndSaveCryptoData').mockResolvedValue();
 
-    const ids = ['bitcoin', 'ethereum'];
-    await controller.fetchAndSaveCryptoData(ids);
+    const request = { ids: ['bitcoin', 'ethereum'] };
+    await controller.fetchAndSaveCryptoData(request);
 
-    expect(service.fetchAndSaveCryptoData).toHaveBeenCalledWith(ids);
+    expect(service.fetchAndSaveCryptoData).toHaveBeenCalledWith(request.ids);
   });
 });
