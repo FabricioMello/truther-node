@@ -4,6 +4,18 @@
 
 `truther-node` is a Node.js application built with NestJS. It provides a RESTful API for managing users and cryptocurrencies. The application uses TypeORM for database interactions and bcrypt for password hashing.
 
+## Tecnologias Utilizadas
+
+Para este projeto, escolhi as seguintes tecnologias para garantir escalabilidade, manutenção e segurança:
+
+- **NestJS**: Framework progressivo para Node.js, baseado em TypeScript, que facilita a criação de aplicações modulares e bem estruturadas.
+- **TypeORM**: ORM que permite interação eficiente com o banco de dados, oferecendo suporte a múltiplos SGBDs e integração nativa com NestJS.
+- **MySQL**: Sistema de gerenciamento de banco de dados relacional utilizado para persistir os dados.
+- **Jest**: Framework de testes robusto, utilizado para testes unitários e de integração, proporcionando uma excelente experiência com funcionalidades como mocks, spies e cobertura de código.
+- **bcrypt**: Biblioteca para hashing de senhas, garantindo segurança no armazenamento de credenciais dos usuários.
+- **Axios**: Biblioteca para realizar chamadas HTTP, utilizada para chamar o endpoint do CoinGecko.
+- **Swagger**: Ferramenta para documentação da API, facilitando a visualização e teste dos endpoints disponíveis.
+
 ## Table of Contents
 
 - [Installation](#installation)
