@@ -23,7 +23,10 @@ export class UserService implements IUserService {
 
     async findOne(id: string): Promise<UserDto | null> {
         const user = await this.userRepository.findOneBy({ id });
-        return user ? this.toUserDto(user) : null;
+        if(!user) {
+            throw new BadRequestException('User not found');
+        }
+        return this.toUserDto(user);
     }
 
     async createUser(user: UserRequest): Promise<UserDto> {
