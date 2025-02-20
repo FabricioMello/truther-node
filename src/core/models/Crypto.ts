@@ -1,13 +1,11 @@
-import { Entity, Column, PrimaryGeneratedColumn, Unique, OneToMany } from 'typeorm';
+import {Entity, Column, OneToMany, Index, PrimaryColumn} from 'typeorm';
 import { CryptoPriceVariation } from './CryptoPriceVariation';
 
 @Entity()
-@Unique(['cryptoId'])
+@Index(['cryptoId'], { unique: true })
 export class Crypto {
-    @PrimaryGeneratedColumn('uuid')
-    id!: string;
 
-    @Column()
+    @PrimaryColumn()
     cryptoId!: string;
 
     @Column({ type: 'bigint', default: 0 })
@@ -15,9 +13,6 @@ export class Crypto {
 
     @Column({ type: 'float', default: 0 })
     variation24h!: number;
-
-    @Column({ type: 'float', default: 0 })
-    variation7d!: number;
 
     @Column({ type: 'float', default: 0 })
     allTimeHigh!: number;
@@ -31,6 +26,9 @@ export class Crypto {
     @Column()
     searchDate!: Date;
 
-    @OneToMany(() => CryptoPriceVariation, priceVariation => priceVariation.crypto, { cascade: true, onDelete: 'CASCADE' })
-    priceVariations!: CryptoPriceVariation[];
+    @OneToMany(() => CryptoPriceVariation, priceVariation => priceVariation.crypto, {
+        cascade: ["insert", "update"],
+        onDelete: 'CASCADE'
+    })
+    variation7d!: CryptoPriceVariation[];
 }

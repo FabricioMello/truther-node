@@ -36,55 +36,53 @@ export class CryptosService implements ICryptosService {
         }
 
         for (const cryptoData of response.data) {
-            const priceVariations = cryptoData.sparkline_in_7d.price.map((price: number) => {
-                return this.priceVariationRepository.create({ price });
-            });
-
             const crypto = this.cryptosRepository.create({
                 cryptoId: cryptoData.id,
                 marketCap: cryptoData.market_cap,
                 variation24h: cryptoData.price_change_percentage_24h,
-                variation7d: cryptoData.price_change_percentage_7d,
                 allTimeHigh: cryptoData.ath,
                 allTimeLow: cryptoData.atl,
                 currentValue: cryptoData.current_price,
-                searchDate: searchDate,
-                priceVariations: priceVariations,
+                searchDate: searchDate
             });
 
-            await this.cryptosRepository.upsert(crypto, ['cryptoId']);
+            await this.priceVariationRepository.delete({ crypto: { cryptoId: cryptoData.id } });
+
+            const savedCrypto = await this.cryptosRepository.save(crypto);
+
+            const priceVariations = cryptoData.sparkline_in_7d.price.map((price: number) => {
+                return this.priceVariationRepository.create({
+                    price,
+                    crypto: savedCrypto,
+                });
+            });
+
+            await this.priceVariationRepository.save(priceVariations);
         }
     }
 
     async findAll(): Promise<CryptoEntity[]> {
         const subQuery = this.cryptosRepository.createQueryBuilder('crypto')
             .select('MAX(crypto.searchDate)', 'maxDate')
-            .addSelect('crypto.id', 'id')
-            .groupBy('crypto.id');
+            .addSelect('crypto.cryptoId', 'cryptoId')
+            .groupBy('crypto.cryptoId');
 
         const query = this.cryptosRepository.createQueryBuilder('crypto')
             .innerJoin(
                 `(${subQuery.getQuery()})`,
                 'sub',
-                'crypto.id = sub.id AND crypto.searchDate = sub.maxDate'
+                'crypto.cryptoId = sub.cryptoId AND crypto.searchDate = sub.maxDate'
             )
-            .orderBy('crypto.id');
+            .orderBy('crypto.cryptoId');
 
         return query.getMany();
     }
 
-    findOne(id: string): Promise<CryptoEntity | null> {
-        return this.cryptosRepository.findOne({
-            where: { id: id },
-            relations: ['priceVariations'],
-            order: { searchDate: 'DESC' },
-        });
-    }
 
-    async findAllByCoinGeckoId(id: string): Promise<CryptoEntity[]> {
-        return this.cryptosRepository.find({
+    async findByCoinGeckoId(id: string): Promise<CryptoEntity | null> {
+        return this.cryptosRepository.findOne({
             where: { cryptoId: id },
-            relations: ['priceVariations'],
+            relations: ['variation7d'],
             order: { searchDate: 'DESC' },
         });
     }

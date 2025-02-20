@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import {Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn} from 'typeorm';
 import { Crypto } from './Crypto';
 
 @Entity()
@@ -9,6 +9,7 @@ export class CryptoPriceVariation {
     @Column({ type: 'float' })
     price!: number;
 
-    @ManyToOne(() => Crypto, crypto => crypto.priceVariations, { onDelete: 'CASCADE' })
+    @ManyToOne(() => Crypto, crypto => crypto.variation7d, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'cryptoId' })
     crypto!: Crypto;
 }

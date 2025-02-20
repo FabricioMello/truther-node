@@ -42,34 +42,15 @@ describe('CryptosController', () => {
       cryptoId: 'bitcoin',
       marketCap: 1000,
       variation24h: 1,
-      variation7d: 2,
       allTimeHigh: 50000,
       allTimeLow: 3000,
       currentValue: 45000,
       searchDate: new Date(),
-      priceVariations: []
+      variation7d: []
     }];
     jest.spyOn(service, 'findAll').mockResolvedValue(cryptos);
     const result = await controller.findAll();
     expect(result).toEqual(cryptos);
-  });
-
-  it('should return a single crypto by ID', async () => {
-    const crypto = {
-      id: '97aa4223-ab4f-490c-9934-35a4ab63a4b6',
-      cryptoId: 'bitcoin',
-      marketCap: 1000,
-      variation24h: 1,
-      variation7d: 2,
-      allTimeHigh: 50000,
-      allTimeLow: 3000,
-      currentValue: 45000,
-      searchDate: new Date(),
-      priceVariations: []
-    };
-    jest.spyOn(service, 'findOne').mockResolvedValue(crypto);
-    const result = await controller.findOne('97aa4223-ab4f-490c-9934-35a4ab63a4b6');
-    expect(result).toEqual(crypto);
   });
 
   it('should fetch and save crypto data', async () => {

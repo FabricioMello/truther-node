@@ -26,17 +26,11 @@ export class CryptosController {
         return this.cryptosService.findAll();
     }
 
-    @ApiOperation({ summary: 'Get a crypto by ID' })
-    @ApiResponse({ status: 200, description: 'Return a single crypto.' })
-    @Get(':id')
-    async findOne(@Param('id') id: string): Promise<CryptoEntity | null> {
-        return this.cryptosService.findOne(id);
-    }
 
     @ApiOperation({ summary: 'Get all cryptos by CoinGecko ID' })
     @ApiResponse({ status: 200, description: 'Return all cryptos by CoinGecko ID.' })
-    @Get('coingecko/:cryptoId')
-    async findAllByCoinGeckoId(@Param('cryptoId') id: string): Promise<CryptoEntity[]> {
-        return this.cryptosService.findAllByCoinGeckoId(id);
+    @Get(':cryptoId')
+    async findAllByCoinGeckoId(@Param('cryptoId') id: string): Promise<CryptoEntity | null> {
+        return this.cryptosService.findByCoinGeckoId(id);
     }
 }
